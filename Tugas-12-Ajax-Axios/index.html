@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+   <forms@submit.prevent=submitForm()>
+      <p v-if="error.lenght">
+          <b>Please correct the following errors :</b>
+          <ul>
+            <li v-for="error in errors">{{ error }}</li>
+          </ul>
+      </p>
+            <label>Name</label>
+            <input type="text" name="name" ref="name" v-model="name">
+            <label>Address </label>
+            <textarea name="address" ref="address" v-model="address"></textarea>
+            <label>No. Hp</label>
+            <input type="number" name="no_hp" ref="no_hp" v-model="no_hp">
+            <input type="submit" value="SUBMIT">
+    </form>
+
+    <br><br>
+
+    <table border=1>
+        <tr>
+            <td>
+                <img width=100 src="https://dummyimage.com/16:9x1080" alt="">
+            </td>
+            <td>
+                <b>Name : </b> "Taufik Hidayat" <br>
+                <b>Address : </b> "Subang" <br>
+                <b>No Hp : </b> "083195866844" <br>
+            </td>
+            <td>
+                <button>Edit</button>
+                <button>Hapus</button>
+                <button>Upload Photo</button>
+            </td>
+        </tr>
+    </table>
+
+
+
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+   var vm = new Vue({
+      el: '#app',
+      data: {
+         Name : '',
+         Address : '',
+         No_Hp : '',
+         errors: ''
+      },
+      methods: {
+          submitForm : function(){
+              this.errors =[]
+
+              if(this.Name.length > 100){
+                  this.errors.push('Tuliskan nama Anda')
+                  this.$refs.Name.focus()
+
+              }
+
+              if(this.Address.length > 100){
+                  this.errors.push('Tuliskan alamat Anda')
+                  this.$refs.Address.focus()
+
+              }
+
+              if(this.No_Hp.length > 100){
+                  this.errors.push('Tuliskan No Hp Anda')
+                  this.$refs.No_Hp.focus()
+
+              if(this.errors.length === 0){
+                  let formData = new FormData()
+                  formData.append('name', this.Name)
+                  formData.append('address', this.Address)
+                  formData.append('no_hp', this.No_Hp)
+                  const config = {
+                      method : "post"
+                      url : "http://demo-api-vue.sanbercloud.com/api/member"
+                      data : formData
+                    }
+
+                  axios(config)
+                  .then((response)=>{
+                    
+                })
+                  .catch((response)=>{
+                      
+                    })
+                  alert('Terima kasih Anda telah mengisi data dengan benar')
+              }
+          },
+      });
+  </script>
+</body>
+</html>
