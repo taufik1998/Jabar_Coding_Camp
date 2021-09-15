@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <members-component>
+        <template v-slot:members>
+        </template>
+    </members-component>
+   
+    <form style="background-color:lightblue; padding: 16px">
+    <p>Name :</p>
+    <input type="text" v-model="inputMember.name" : disable="uploads">
+    <p>Alamat :</p>
+    <input type="text" v-model="inputMember.address" : disable="uploads">
+    <p>Nomor Handphone</p>
+    <input type="text" v-model="inputMember.no_hp" : disable="uploads">
+    <p></p>
+    <input type="file" v-if="uploadstate" name="pp" ref="pp" />
+    <p></p>
+    <input type="button" value="SUBMIT" v-if="!(editstate || uploadstate)" v-one:click="addmember"/>
+    <input type="button" value="UPDATE" v-if="!editstate" v-one:click="updatemember"/>
+    <input type="button" value="CANCEL" v-if="!editstate" v-one:click="cancel"/>
+</form>
+<br />
+  </div>
+        <table border="">
+            <tr v-for="m in members">
+                <td style="padding: 16px">
+                        <img width="m.photo_profile ? url + m.photo_profile : 'https://dummyimage.com/16:9x1080'"/>
+                </td>
+                <td style="width:100%; padding: 16px">
+                    <pre><b>ID                :</b> {{m.id}}</pre>
+                    <pre><b>Nama              :</b> {{m.name}}</pre>
+                    <pre><b>Alamat            :</b> {{m.Address}}</pre>
+                    <pre><b>Nomor Handphone   :</b> {{m.no_hp}}</pre>
+                </td>
+                <td align="right" style="padding: 16px">
+                <input type="button" value="Edit" v-on:click="editMember(m)" style="width:100%" />
+                <input type="button" value="Hapus" v-on:click="deleteMember(m.id)" style="width:100%" />
+                <input type="button" value="Upload Photo" v-on:click="uploadphoto(m)" style="width:100%" />            
+            </td>
+            </tr>
+        </table>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+ 
+ var MembersComponent = {
+       template :
+       <div>
+       <b>Member</b> : <slot name="members">{{data:[0].members}}</slot>
+       </div>
+   }
+   
+   const vm = new Vue({
+      el: '#app',
+      data: {
+        url: "http://demo-api-vue.sanbercloud.com/",
+        members: [],
+        inputMember: {
+            name: "",
+            address: "",
+            no_hp: "",
+        },
+        currentId: null,
+        editstate: false,
+        uploadstate: false,
+      },
+      methods: {
+          Validation: function() {
+              string.prototype.isNumber = function() {
+                  return /^\d+$/.test(this);
+              };
+              if (this.inputMember.name.length < 3) {
+                  alert("Nama minimal memiliki 3 karakter");
+                  return false;
+              }
+              if (this.inputMember.address.length < 5) {
+                  alert("Alamat minimal memiliki 5 karakter");
+                  return false;
+              }
+              if (this.inputMember.no_hp.length < 10) {
+                  alert("Nomor Handphone minimal memiliki 10 digit");
+                  return false;
+              }
+              if (!this.inputMember.no_hp.isNumber()) {
+                  alert("Nomor Handphone tidak boleh mengandung selain angka");
+                  return false;
+              }
+              return true;
+              }
+          },
+          clearForm: function() {
+              this.inputMember.name = "";
+              this.inputMember.address = "";
+              this.inputMember.no_hp = "";
+              this.currentId = null;
+          },
+          getMembers: async function() {
+              try {
+                  const {
+                      data
+                  } = await axios.get(`${this.url}/member`)
+              } catch (e) {
+                  console.log(e)
+              }
+              this.updateMember()
+          },
+          addMember: async function() {
+            try {
+                  const {
+                      response
+                  } = await axios.post(`${this.url}/member`,
+                    this.member
+                  )
+              } catch (e) {
+                  console.log(e);
+              }
+            },
+          updateMember: async function() {
+            try {
+                  const {
+                      response
+                  } = await axios.post(`${this.url}/member/${this.members[0].id}?_method=PUT`,
+                    this.memberupdated
+                  );
+              } catch (e) {
+                  console.log(e);
+              }
+            },
+          editMember: function(m) {
+              this.editstate = true;
+              this.currentId = m.id;
+              this.inputMember = {
+                  name: m.name,
+                  address: m.address,
+                  no_hp: m.no_hp,
+              }
+          },
+          cancel: function() {
+              this.editstate = false;
+              this.currentId = 0;
+              this.inputMember = {
+                  name: "",
+                  address:"",
+                  no_hp: "",
+              };
+          },
+          deleteMember: async function() {
+            try {
+                  const {
+                      response
+                  } = await axios.post(`${this.url}/member/${this.members[0].id}?_method=DELETE`,
+                  );
+              } catch (e) {
+                  console.log(e);
+              }
+          },
+created() {
+    this.getMembers();
+}     
+});
+  </script>
+</body>
+</html>
