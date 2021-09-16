@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <h1>Belajar Vue Router</h1>
+     <router-link to="/">Halaman 1</router-link>
+     <router-link to="/Halaman2">Halaman 2</router-link>
+     <router-link to="/categories">Halaman 3</router-link>        
+     <hr>
+     <router-view></router-view>
+     
+  </div>
+   <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+   <script>
+    
+    const Halaman1 = { template: '<div>Ini Halaman Satu</div>' }
+    const Halaman2 = { template: '<div>Ini Halaman Dua</div>' }
+
+    const routes = [
+  { path: '/', component: Halaman1 , alias: '/halaman 1'},
+  { path: '/Halaman2', component: Halaman2, meta: { login: true } },
+  { path: '/categories', component: CategoriesComponent, admin: {login: true}},
+  { path: '/category/:id', component: CategoryComponent },
+  {path: '*', redirect: '/' }
+                    ]
+    const router = new VueRouter({
+          routes 
+                      })
+    router.beforeEach((to, from, next) =>{
+        if (to.matched.some(record => record.meta.login)) {
+            let auth = false;
+            if(!auth){
+            alert('Halaman ini hanya untuk user yang sudah login!')
+            next(false)
+        }else{
+            next()
+            alert('Berhasil Masuk')
+        }
+    }
+    })
+    router.beforeEach((to, from, next) =>{
+        if (to.matched.some(record => record.admin.login)) {
+            let auth = false;
+            if(!auth){
+            alert('Halaman ini hanya untuk admin!')
+            next(false)
+        }else{
+            next()
+            alert('Berhasil Masuk')
+        }
+    }
+    })
+ var vm = new Vue({ 
+   el: '#app', 
+   router, 
+  })
+
+</script>
+<script type="module">
+    import { CategoriesComponent } from './CategoriesComponent.js'
+    import { CategoryComponent } from './CategoryComponent.js'
+</script>
+</body>
+</html>
